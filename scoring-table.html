@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <title>Scoring Table — Sports Live</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #101713;
+      --surface: #19231d;
+      --surface-raised: #1f2b24;
+      --text: #edf5ef;
+      --muted: #9aa99f;
+      --line: #2c3a31;
+      --accent: #68d5a0;
+      --accent-strong: #145e43;
+      --accent-soft: #253b30;
+      --live: #ff7770;
+      --shadow: 0 18px 50px rgb(0 0 0 / 22%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 8% 0%, rgb(40 94 66 / 24%), transparent 34rem),
+        radial-gradient(ellipse at 95% 22%, rgb(34 75 54 / 13%), transparent 28rem),
+        linear-gradient(180deg, #101713, #131c17 38rem);
+      font-size: 14px;
+    }
+
+    button, a { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+
+    .page-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 30px 28px 60px;
+    }
+
+    .topbar, .brand, .topbar-actions, .section-heading, .date-controls,
+    .score-header, .team, .score-footer, .source-link, .live-indicator {
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar { justify-content: space-between; margin-bottom: 42px; }
+    .brand { gap: 10px; text-decoration: none; font-size: 16px; font-weight: 800; letter-spacing: -.04em; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--accent-strong);
+      color: #a0f3c3;
+    }
+    .brand-mark svg { width: 19px; height: 19px; }
+    .topbar-actions { gap: 20px; }
+    .topbar-link { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 650; }
+    .topbar-link:hover { color: var(--accent); }
+    .live-indicator { gap: 8px; color: var(--muted); font-size: 12px; }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #30a56d; box-shadow: 0 0 0 3px #30a56d1f; }
+
+    .intro { margin-bottom: 26px; }
+    .eyebrow { margin: 0 0 9px; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(34px, 5vw, 50px); line-height: 1.04; letter-spacing: -.06em; }
+    .intro-copy { margin: 12px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+    .league-tabs {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      margin: 0 0 23px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgb(25 35 29 / 90%);
+      scrollbar-width: thin;
+    }
+    .league-tab {
+      min-width: 76px;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 750;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .league-tab:hover { color: var(--text); }
+    .league-tab[aria-selected="true"] { background: var(--accent-strong); color: #a0f3c3; }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 290px; align-items: start; gap: 20px; }
+    .content-grid.is-full-width { grid-template-columns: minmax(0, 1fr); }
+    .scoreboard-panel, .side-panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .scoreboard-panel { min-height: 420px; overflow: hidden; }
+    .section-heading { justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+    .section-title { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.035em; }
+    .date-controls { gap: 8px; }
+    .last-updated { color: var(--muted); font-size: 10px; white-space: nowrap; }
+    .date-controls button, .refresh-button {
+      display: inline-grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      cursor: pointer;
+    }
+    .date-controls button:hover, .refresh-button:hover { border-color: #42694f; background: #263a2e; }
+    .date-controls button svg, .refresh-button svg { width: 16px; height: 16px; }
+    .selected-date { min-width: 112px; color: var(--muted); font-size: 12px; font-weight: 650; text-align: center; }
+    .summary-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+    .summary-stat { padding: 13px 20px; border-right: 1px solid var(--line); }
+    .summary-stat:last-child { border-right: 0; }
+    .summary-value { display: block; color: var(--text); font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .summary-label { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 650; }
+    .score-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; padding: 17px; }
+    .score-list.is-articles { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+    .article-card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-raised); }
+    .article-image { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #27332c; }
+    .article-body { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 14px; }
+    .article-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-bottom: 9px; color: var(--muted); font-size: 10px; }
+    .article-league { padding: 4px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .04em; }
+    .article-headline { margin: 0; color: var(--text); font-size: 14px; font-weight: 800; line-height: 1.4; letter-spacing: -.02em; }
+    .article-description { display: -webkit-box; overflow: hidden; margin: 8px 0 13px; color: var(--muted); font-size: 11px; line-height: 1.55; line-clamp: 3; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+    .article-link { margin-top: auto; color: var(--accent); font-size: 10px; font-weight: 800; text-decoration: none; }
+    .article-link:hover { text-decoration: underline; }
+    .score-list.is-odds { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    .odds-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-raised); }
+    .odds-game-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
+    .odds-game-name { margin: 0; color: var(--text); font-size: 13px; font-weight: 800; line-height: 1.35; }
+    .odds-game-meta { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .odds-league-badge { flex: 0 0 auto; padding: 4px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-size: 9px; font-weight: 850; }
+    .odds-provider { margin: 12px 0 8px; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .odds-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 10px; }
+    .odds-table th { padding: 0 5px 7px; color: var(--muted); font-size: 9px; font-weight: 700; text-align: right; }
+    .odds-table th:first-child, .odds-table td:first-child { width: 24%; padding-left: 0; text-align: left; }
+    .odds-table td { padding: 8px 5px; border-top: 1px solid var(--line); color: var(--text); font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+    .odds-table td:first-child { color: var(--muted); font-weight: 700; }
+    .odds-disclaimer { margin: 0 18px 16px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+
+    .score-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-raised); }
+    .score-header { justify-content: space-between; gap: 8px; margin-bottom: 14px; color: var(--muted); font-size: 11px; }
+    .game-status { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .live-badge { flex: 0 0 auto; padding: 4px 7px; border-radius: 99px; background: #482a29; color: var(--live); font-size: 9px; font-weight: 850; letter-spacing: .08em; }
+    .team-list { display: grid; gap: 13px; }
+    .team { min-width: 0; gap: 9px; }
+    .team-logo { width: 28px; height: 28px; flex: 0 0 28px; object-fit: contain; }
+    .team-logo-fallback { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border-radius: 50%; background: #eef3ef; color: var(--muted); font-size: 9px; font-weight: 800; }
+    .team-name { overflow: hidden; flex: 1; color: var(--text); font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+    .team-record { color: var(--muted); font-size: 10px; font-weight: 550; white-space: nowrap; }
+    .team-score { min-width: 20px; color: var(--text); font-size: 17px; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+    .score-footer { justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    .game-link { color: var(--accent); font-weight: 700; text-decoration: none; white-space: nowrap; }
+    .game-link:hover { text-decoration: underline; }
+
+    .panel-state { grid-column: 1 / -1; display: grid; min-height: 260px; place-content: center; justify-items: center; padding: 30px; color: var(--muted); text-align: center; }
+    .panel-state strong { margin-bottom: 6px; color: var(--text); font-size: 15px; }
+    .panel-state p { max-width: 360px; margin: 0; line-height: 1.6; }
+    .panel-state button { margin-top: 14px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-raised); cursor: pointer; font-weight: 700; }
+
+    .side-column { display: grid; gap: 16px; }
+    .side-panel { padding: 20px; }
+    .side-panel h2 { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: -.02em; }
+    .side-copy { margin: 8px 0 15px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .source-link { justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 12px; font-weight: 700; text-decoration: none; }
+    .source-link span:last-child { color: var(--muted); font-size: 11px; }
+    .source-link:hover { color: var(--accent); }
+    .update-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .refresh-button { width: 30px; height: 30px; }
+    .attribution { margin: 18px 3px 0; color: #929d96; font-size: 10px; line-height: 1.5; }
+    @media (max-width: 780px) {
+      .page-shell { padding: 23px 18px 40px; }
+      .content-grid { grid-template-columns: minmax(0, 1fr); }
+      .side-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .team-explorer { grid-column: 1 / -1; }
+    }
+    @media (max-width: 560px) {
+      .page-shell { padding-inline: 14px; }
+      .topbar { margin-bottom: 32px; }
+      .topbar-actions { gap: 12px; }
+      .topbar-link { display: none; }
+      .intro-copy { max-width: 30rem; font-size: 14px; }
+      .league-tab { min-width: 66px; padding-inline: 12px; }
+      .section-heading { padding: 16px; }
+      .summary-stat { padding: 12px 16px; }
+      .score-list, .score-list.is-articles, .score-list.is-odds { grid-template-columns: 1fr; padding: 12px; }
+      .side-column { grid-template-columns: 1fr; }
+      .selected-date { min-width: 96px; font-size: 11px; }
+      .last-updated { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Scoring Table home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 20.5 8v8L12 21l-8.5-5V8L12 3Z" stroke="currentColor" stroke-width="1.8"/><path d="m8 12 2.5 2.5L16.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        Scoring Table
+      </a>
+      <div class="topbar-actions">
+        <a class="topbar-link" href="https://www.espn.com/" target="_blank" rel="noopener noreferrer">ESPN</a>
+        <a class="topbar-link" href="https://www.foxnews.com/sports" target="_blank" rel="noopener noreferrer">Fox News Sports</a>
+        <span class="live-indicator"><span class="live-dot" aria-hidden="true"></span> Live score updates</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">The scores, all in one place</p>
+        <h1 id="page-title">Game day, at a glance.</h1>
+        <p class="intro-copy">Live scores and matchups from the leagues you follow. Choose a league to see the latest scoreboard.</p>
+      </section>
+
+      <div class="league-tabs" role="tablist" aria-label="Choose a league">
+        <button class="league-tab" id="tab-mlb" role="tab" type="button" aria-selected="true" aria-controls="score-list" data-league="mlb">MLB</button>
+        <button class="league-tab" id="tab-nfl" role="tab" type="button" aria-selected="false" aria-controls="score-list" data-league="nfl" tabindex="-1">NFL</button>
+        <button class="league-tab" id="tab-nhl" role="tab" type="button" aria-selected="false" aria-controls="score-list" data-league="nhl" tabindex="-1">NHL</button>
+        <button class="league-tab" id="tab-fifa" role="tab" type="button" aria-selected="false" aria-controls="score-list" data-league="fifa" tabindex="-1">FIFA</button>
+        <button class="league-tab" id="tab-nba" role="tab" type="button" aria-selected="false" aria-controls="score-list" data-league="nba" tabindex="-1">NBA</button>
+        <button class="league-tab" id="tab-odds" role="tab" type="button" aria-selected="false" aria-controls="score-list" data-league="odds" tabindex="-1">Odds</button>
+        <button class="league-tab" id="tab-articles" role="tab" type="button" aria-selected="false" aria-controls="score-list" data-league="articles" tabindex="-1">Articles</button>
+      </div>
+
+      <div class="content-grid">
+        <section class="scoreboard-panel" aria-labelledby="scoreboard-title">
+          <div class="section-heading">
+            <h2 class="section-title" id="scoreboard-title">MLB scoreboard</h2>
+            <div class="date-controls" aria-label="Scoreboard date">
+              <button id="previous-day" type="button" aria-label="Previous day">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m12 4-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <time class="selected-date" id="selected-date"></time>
+              <button id="next-day" type="button" aria-label="Next day">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m8 4 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <span id="last-updated" class="last-updated" aria-live="polite">Waiting for scores…</span>
+              <button class="refresh-button" id="refresh-scores" type="button" aria-label="Refresh scores">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.5 9a6.5 6.5 0 0 0-11.7-3.9L3 7m0 0V3.5M3 7h3.5M3.5 11a6.5 6.5 0 0 0 11.7 3.9L17 13m0 0v3.5M17 13h-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="summary-strip" id="summary-strip" aria-label="Selected league game summary">
+            <div class="summary-stat"><span class="summary-value" id="games-count">—</span><span class="summary-label" id="games-label">GAMES</span></div>
+            <div class="summary-stat"><span class="summary-value" id="live-count">—</span><span class="summary-label" id="live-label">LIVE</span></div>
+            <div class="summary-stat"><span class="summary-value" id="final-count">—</span><span class="summary-label" id="final-label">FINAL</span></div>
+          </div>
+          <div class="score-list" id="score-list" role="tabpanel" aria-labelledby="tab-mlb" aria-live="polite" aria-busy="true"></div>
+          <p class="odds-disclaimer" id="odds-disclaimer" hidden>Odds are provided by ESPN and DraftKings for informational purposes only. Lines can change and may not be available in every location. No wagers are placed here. 21+ only where legal.</p>
+        </section>
+
+        <aside class="side-column" aria-label="Sports sources and updates">
+          <section class="side-panel" id="team-panel">
+            <h2>From the scoreboard</h2>
+            <p class="side-copy">Scores refresh automatically while this page is open. League scoreboards open on ESPN.</p>
+            <a class="source-link" href="https://www.espn.com/" target="_blank" rel="noopener noreferrer"><span>ESPN scores &amp; coverage</span><span aria-hidden="true">↗</span></a>
+            <a class="source-link" href="https://www.foxnews.com/sports" target="_blank" rel="noopener noreferrer"><span>Fox News Sports</span><span aria-hidden="true">↗</span></a>
+            <p class="attribution">Scoreboard data is provided by ESPN. Fox News Sports opens its website; headlines are not embedded here.</p>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const leagues = {
+        mlb: { label: "MLB", sport: "baseball", league: "mlb" },
+        nfl: { label: "NFL", sport: "football", league: "nfl" },
+        nhl: { label: "NHL", sport: "hockey", league: "nhl" },
+        fifa: { label: "FIFA World Cup", sport: "soccer", league: "fifa.world" },
+        nba: { label: "NBA", sport: "basketball", league: "nba" }
+      };
+      const tabs = [...document.querySelectorAll(".league-tab")];
+      const scoreList = document.querySelector("#score-list");
+      const scoreboardTitle = document.querySelector("#scoreboard-title");
+      const selectedDate = document.querySelector("#selected-date");
+      const lastUpdated = document.querySelector("#last-updated");
+      const gamesCount = document.querySelector("#games-count");
+      const liveCount = document.querySelector("#live-count");
+      const finalCount = document.querySelector("#final-count");
+      const dateControls = document.querySelector(".date-controls");
+      const summaryStrip = document.querySelector("#summary-strip");
+      const summaryLabels = [
+        document.querySelector("#games-label"),
+        document.querySelector("#live-label"),
+        document.querySelector("#final-label")
+      ];
+      const oddsDisclaimer = document.querySelector("#odds-disclaimer");
+      const contentGrid = document.querySelector(".content-grid");
+      const sideColumn = document.querySelector(".side-column");
+      const teamSelect = document.querySelector("#team-select");
+      const teamPickerCopy = document.querySelector("#team-picker-copy");
+      const teamDetails = document.querySelector("#team-details");
+      const teamPanel = document.querySelector("#team-panel");
+      const teamCache = new Map();
+      const selectedTeamIds = new Map();
+      let currentLeague = "mlb";
+      let currentView = "scores";
+      let date = new Date();
+      let activeRequest;
+      let requestVersion = 0;
+      let activeArticlesRequest;
+      let articlesRequestVersion = 0;
+      let activeOddsRequest;
+      let oddsRequestVersion = 0;
+      let activeTeamDetailsRequest;
+      let teamDetailsVersion = 0;
+
+      const dateKey = value =>
+        `${value.getFullYear()}${String(value.getMonth() + 1).padStart(2, "0")}${String(value.getDate()).padStart(2, "0")}`;
+
+      function updateDateLabel() {
+        selectedDate.dateTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        selectedDate.textContent = date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+      }
+
+      function makeElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+      }
+
+      function showState(title, message, retry = false, onRetry = loadScores) {
+        scoreList.replaceChildren();
+        const state = makeElement("div", "panel-state");
+        state.append(makeElement("strong", "", title), makeElement("p", "", message));
+        if (retry) {
+          const button = makeElement("button", "", "Try again");
+          button.type = "button";
+          button.addEventListener("click", onRetry);
+          state.append(button);
+        }
+        scoreList.append(state);
+      }
+
+      function showTeamState(message, retry) {
+        teamDetails.replaceChildren();
+        const state = makeElement("p", "team-details-state", message);
+        teamDetails.append(state);
+        if (retry) {
+          const button = makeElement("button", "panel-state-button", "Try again");
+          button.type = "button";
+          button.addEventListener("click", retry);
+          teamDetails.append(button);
+        }
+      }
+
+      function teamEndpoint(league, path) {
+        return new URL(`https://site.api.espn.com/apis/site/v2/sports/${league.sport}/${league.league}/${path}`);
+      }
+
+      function setTeamOptions(teams) {
+        teamSelect.replaceChildren(new Option("Choose a team…", ""));
+        for (const team of teams) {
+          const option = new Option(team.displayName || team.name || team.abbreviation, team.id);
+          teamSelect.append(option);
+        }
+        const rememberedId = selectedTeamIds.get(currentLeague);
+        teamSelect.value = rememberedId && teams.some(team => team.id === rememberedId) ? rememberedId : "";
+        teamSelect.disabled = false;
+        teamPickerCopy.textContent = `Choose from all ${teams.length} ${leagues[currentLeague].label} teams to see standings, season stats, and schedule.`;
+
+        const selectedTeam = teams.find(team => team.id === teamSelect.value);
+        if (selectedTeam) loadTeamDetails(selectedTeam);
+        else {
+          if (rememberedId) selectedTeamIds.delete(currentLeague);
+          showTeamState("Choose a team to see its record, season stats, and recent or upcoming games.");
+        }
+      }
+
+      function loadTeams() {
+        const leagueKey = currentLeague;
+        const teams = window.SPORTS_TEAMS && window.SPORTS_TEAMS[leagueKey];
+        if (!Array.isArray(teams) || !teams.length) {
+          teamSelect.replaceChildren(new Option("Team directory unavailable", ""));
+          teamSelect.disabled = true;
+          teamPickerCopy.textContent = `The ${leagues[leagueKey].label} team directory is unavailable.`;
+          showTeamState("Could not load the local team directory.");
+          return;
+        }
+        teamCache.set(leagueKey, teams);
+        setTeamOptions(teams);
+      }
+
+      function teamLogo(team) {
+        if (typeof team.logo === "string") return team.logo;
+        const logos = team.logos || [];
+        return logos.find(logo => logo.rel && logo.rel.includes("default"))?.href || logos[0]?.href;
+      }
+
+      function teamStatistics(statsData) {
+        const stats = (statsData?.results?.stats?.categories || [])
+          .flatMap(category => category.stats || []);
+        const preferences = {
+          mlb: ["avg", "homeRuns", "runs", "hits"],
+          nfl: ["totalYards", "passingYards", "rushingYards", "totalTouchdowns", "completionPct"],
+          nhl: ["points", "goals", "assists", "powerPlayPct", "savePct"],
+          nba: ["avgPoints", "avgRebounds", "avgAssists", "threePointPct", "avgBlocks"],
+          fifa: []
+        }[currentLeague];
+        const selected = preferences
+          .map(name => stats.find(stat => stat.name === name))
+          .filter(stat => stat && stat.displayValue !== undefined);
+        if (!selected.length && currentLeague !== "fifa") {
+          selected.push(...stats.filter(stat =>
+            stat.displayValue !== undefined &&
+            !["teamGamesPlayed", "gamesPlayed", "games", "fullInningsPlayed"].includes(stat.name)
+          ).slice(0, 4));
+        }
+        return selected.slice(0, 4);
+      }
+
+      function scheduleEvents(scheduleData, team) {
+        const events = scheduleData?.events || [];
+        const matchForTeam = event => {
+          const competitors = event.competitors || event.competitions?.[0]?.competitors || [];
+          const index = competitors.findIndex(competitor =>
+            String(competitor.id || competitor.team?.id || "") === String(team.id) ||
+            (typeof competitor.team === "string" && competitor.team === team.displayName) ||
+            competitor.team?.displayName === team.displayName
+          );
+          if (index < 0) return null;
+          return { event, competitors, teamIndex: index };
+        };
+        const games = events.map(matchForTeam).filter(Boolean);
+        const now = Date.now();
+        const recent = games
+          .filter(game => new Date(game.event.date).getTime() < now)
+          .sort((a, b) => new Date(b.event.date) - new Date(a.event.date))
+          .slice(0, 2);
+        const upcoming = games
+          .filter(game => new Date(game.event.date).getTime() >= now)
+          .sort((a, b) => new Date(a.event.date) - new Date(b.event.date))
+          .slice(0, 3);
+        return [...recent, ...upcoming];
+      }
+
+      function appendTeamMetrics(profile, statsData) {
+        const metrics = [];
+        if (profile?.recordSummary) metrics.push({ label: "Record", value: profile.recordSummary });
+        if (profile?.standingSummary) metrics.push({ label: "Standing", value: profile.standingSummary });
+        for (const stat of teamStatistics(statsData)) {
+          metrics.push({
+            label: stat.abbreviation || stat.displayName || stat.name,
+            value: stat.displayValue
+          });
+        }
+        if (!metrics.length) return false;
+
+        const grid = makeElement("div", "team-metrics");
+        for (const metric of metrics.slice(0, 6)) {
+          const cell = makeElement("div", "team-metric");
+          cell.append(
+            makeElement("span", "team-metric-value", metric.value),
+            makeElement("span", "team-metric-label", metric.label)
+          );
+          grid.append(cell);
+        }
+        teamDetails.append(grid);
+        return true;
+      }
+
+      function appendTeamSchedule(scheduleData, team, league) {
+        const games = scheduleEvents(scheduleData, team);
+        const heading = makeElement("p", "team-detail-label", "Recent & upcoming");
+        teamDetails.append(heading);
+        if (!games.length) {
+          teamDetails.append(makeElement("p", "team-details-state", "No recent or upcoming games are listed."));
+          return;
+        }
+
+        const list = makeElement("div", "team-schedule");
+        for (const game of games) {
+          const own = game.competitors[game.teamIndex];
+          const opponent = game.competitors.find((_, index) => index !== game.teamIndex);
+          const opponentName = typeof opponent?.team === "string"
+            ? opponent.team
+            : opponent?.team?.displayName || opponent?.displayName || "Opponent";
+          const eventDate = new Date(game.event.date);
+          const ownScore = own.score?.displayValue ?? own.score?.value ?? own.score;
+          const opponentScore = opponent?.score?.displayValue ?? opponent?.score?.value ?? opponent?.score;
+          const hasScore = ownScore !== undefined && ownScore !== null && opponentScore !== undefined && opponentScore !== null;
+          const result = hasScore ? `${ownScore}–${opponentScore}` : eventDate < new Date() ? "Recent" : "Upcoming";
+          const row = makeElement("div", "team-schedule-row");
+          row.append(
+            makeElement("span", "team-schedule-opponent", `${opponentName} · ${eventDate.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`),
+            makeElement("span", "team-schedule-result", result)
+          );
+          list.append(row);
+        }
+        teamDetails.append(list);
+        const eventLink = games[games.length - 1].event.links?.find(link =>
+          link.rel?.includes("desktop") || link.rel?.includes("boxscore")
+        )?.href;
+        const scheduleLink = team.schedule || team.links?.find(link => link.rel?.includes("schedule") || link.rel?.includes("fixtures"))?.href;
+        const href = scheduleLink || eventLink || `https://www.espn.com/${league.sport}/${league.league}/scoreboard`;
+        const link = makeElement("a", "game-link", "Full schedule ↗");
+        link.href = href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.style.display = "inline-block";
+        link.style.marginTop = "11px";
+        teamDetails.append(link);
+      }
+
+      async function loadTeamDetails(team) {
+        if (activeTeamDetailsRequest) activeTeamDetailsRequest.abort();
+        const version = ++teamDetailsVersion;
+        const leagueKey = currentLeague;
+        const league = leagues[leagueKey];
+        const controller = new AbortController();
+        activeTeamDetailsRequest = controller;
+        teamDetails.setAttribute("aria-busy", "true");
+        showTeamState(`Loading ${team.displayName || team.name} details…`);
+
+        const requestJson = async path => {
+          const response = await fetch(teamEndpoint(league, path), { signal: controller.signal });
+          if (!response.ok) throw new Error(`Team data request failed (${response.status}).`);
+          return response.json();
+        };
+
+        try {
+          const [scheduleResult, statsResult] = await Promise.allSettled([
+            requestJson(`teams/${encodeURIComponent(team.id)}/schedule`),
+            requestJson(`teams/${encodeURIComponent(team.id)}/statistics`)
+          ]);
+          if (version !== teamDetailsVersion || leagueKey !== currentLeague) return;
+          if (scheduleResult.status === "rejected" && statsResult.status === "rejected") {
+            throw scheduleResult.reason;
+          }
+
+          const scheduleData = scheduleResult.status === "fulfilled" ? scheduleResult.value : null;
+          const statsData = statsResult.status === "fulfilled" ? statsResult.value : null;
+          teamDetails.replaceChildren();
+          const header = makeElement("div", "team-profile");
+          const logoUrl = teamLogo(team);
+          if (logoUrl) {
+            const logo = makeElement("img", "team-profile-logo");
+            logo.src = logoUrl;
+            logo.alt = "";
+            logo.addEventListener("error", () => { logo.hidden = true; }, { once: true });
+            header.append(logo);
+          }
+          const titleBlock = makeElement("div", "");
+          titleBlock.append(makeElement("p", "team-profile-name", team.displayName || team.name));
+          const summary = scheduleData?.team?.recordSummary || team.abbreviation || league.label;
+          titleBlock.append(makeElement("p", "team-profile-record", summary));
+          header.append(titleBlock);
+          const clubhouseLink = team.clubhouse || team.links?.find(link => link.rel?.includes("clubhouse"))?.href;
+          if (clubhouseLink) {
+            const link = makeElement("a", "team-profile-link", "ESPN ↗");
+            link.href = clubhouseLink;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            header.append(link);
+          }
+          teamDetails.append(header);
+
+          const hasMetrics = appendTeamMetrics(scheduleData?.team, statsData);
+          if (!hasMetrics) {
+            teamDetails.append(makeElement("p", "team-details-state", "Season stats and standings are not available for this team."));
+          }
+          if (scheduleResult.status === "fulfilled") appendTeamSchedule(scheduleData, team, league);
+          else {
+            console.error(`Could not load the ${team.displayName || team.name} schedule.`, scheduleResult.reason);
+            teamDetails.append(makeElement("p", "team-details-state", "Schedule is temporarily unavailable."));
+          }
+          if (statsResult.status === "rejected") {
+            console.error(`Could not load ${team.displayName || team.name} statistics.`, statsResult.reason);
+          }
+        } catch (error) {
+          if (error.name === "AbortError" || version !== teamDetailsVersion) return;
+          console.error(`Could not load ${team.displayName || team.name} details.`, error);
+          showTeamState("Team details are unavailable. Try again.", () => loadTeamDetails(team));
+        } finally {
+          if (version === teamDetailsVersion) teamDetails.setAttribute("aria-busy", "false");
+        }
+      }
+
+      function getTeamRecord(team) {
+        const record = team.records && team.records.find(item => item.type === "total");
+        return record ? record.summary : "";
+      }
+
+      function makeTeamRow(competitor) {
+        const team = competitor.team || {};
+        const row = makeElement("div", "team");
+        if (team.logo) {
+          const logo = makeElement("img", "team-logo");
+          logo.src = team.logo;
+          logo.alt = "";
+          logo.loading = "lazy";
+          logo.addEventListener("error", () => {
+            const fallback = makeElement("span", "team-logo-fallback", team.abbreviation || "—");
+            fallback.setAttribute("aria-hidden", "true");
+            logo.replaceWith(fallback);
+          }, { once: true });
+          row.append(logo);
+        } else {
+          const fallback = makeElement("span", "team-logo-fallback", team.abbreviation || "—");
+          fallback.setAttribute("aria-hidden", "true");
+          row.append(fallback);
+        }
+
+        row.append(makeElement("span", "team-name", team.displayName || team.name || "Team"));
+        const record = getTeamRecord(competitor);
+        if (record) row.append(makeElement("span", "team-record", record));
+        row.append(makeElement("span", "team-score", competitor.score ?? "—"));
+        return row;
+      }
+
+      function makeScoreCard(event) {
+        const competition = event.competitions && event.competitions[0];
+        const competitors = competition && competition.competitors;
+        if (!competition || !Array.isArray(competitors) || competitors.length < 2) return null;
+
+        const status = competition.status && competition.status.type;
+        const card = makeElement("article", "score-card");
+        const header = makeElement("div", "score-header");
+        const statusLabel = status && status.detail
+          ? status.detail
+          : new Date(event.date).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+        header.append(makeElement("span", "game-status", statusLabel));
+        if (status && status.state === "in") header.append(makeElement("span", "live-badge", "LIVE"));
+        card.append(header);
+
+        const teamList = makeElement("div", "team-list");
+        const orderedCompetitors = [...competitors].sort((a, b) =>
+          (a.homeAway === "away" ? 0 : 1) - (b.homeAway === "away" ? 0 : 1)
+        );
+        orderedCompetitors.forEach(competitor => teamList.append(makeTeamRow(competitor)));
+        card.append(teamList);
+
+        const footer = makeElement("div", "score-footer");
+        const venue = competition.venue;
+        const venueLabel = venue && (venue.address && venue.address.city || venue.fullName);
+        footer.append(makeElement("span", "", venueLabel || event.name || "Game"));
+        const link = makeElement("a", "game-link", "ESPN scoreboard ↗");
+        link.href = `https://www.espn.com/${leagues[currentLeague].sport}/${leagues[currentLeague].league}/scoreboard`;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        footer.append(link);
+        card.append(footer);
+        return card;
+      }
+
+      function makeArticleCard(article, leagueLabel) {
+        const articleUrl = article.links?.web?.href || article.links?.mobile?.href;
+        if (!articleUrl || !article.headline) return null;
+        let parsedUrl;
+        try {
+          parsedUrl = new URL(articleUrl);
+        } catch {
+          return null;
+        }
+        if (parsedUrl.protocol !== "https:") return null;
+
+        const card = makeElement("article", "article-card");
+        const image = article.images?.find(item => item.url);
+        if (image) {
+          const img = makeElement("img", "article-image");
+          img.src = image.url;
+          img.alt = image.alt || image.name || "";
+          img.loading = "lazy";
+          img.addEventListener("error", () => img.remove(), { once: true });
+          card.append(img);
+        }
+        const body = makeElement("div", "article-body");
+        const meta = makeElement("div", "article-meta");
+        meta.append(makeElement("span", "article-league", leagueLabel));
+        if (article.published) {
+          const published = new Date(article.published);
+          if (!Number.isNaN(published.getTime())) {
+            const time = makeElement("time", "", published.toLocaleDateString(undefined, { month: "short", day: "numeric" }));
+            time.dateTime = published.toISOString();
+            meta.append(time);
+          }
+        }
+        body.append(meta, makeElement("h3", "article-headline", article.headline));
+        if (article.description) body.append(makeElement("p", "article-description", article.description));
+        const link = makeElement("a", "article-link", "Read on ESPN ↗");
+        link.href = parsedUrl.href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        body.append(link);
+        card.append(body);
+        return card;
+      }
+
+      async function loadArticles() {
+        if (activeArticlesRequest) activeArticlesRequest.abort();
+        if (activeOddsRequest) activeOddsRequest.abort();
+        oddsRequestVersion++;
+        const controller = new AbortController();
+        activeArticlesRequest = controller;
+        const version = ++articlesRequestVersion;
+        const entries = Object.entries(leagues);
+        scoreList.classList.add("is-articles");
+        scoreList.classList.remove("is-odds");
+        oddsDisclaimer.hidden = true;
+        scoreList.setAttribute("aria-labelledby", "tab-articles");
+        scoreList.setAttribute("aria-busy", "true");
+        scoreboardTitle.textContent = "Latest sports articles";
+        gamesCount.textContent = "—";
+        liveCount.textContent = "—";
+        finalCount.textContent = "—";
+        showState("Loading sports articles…", "Fetching the latest ESPN headlines across all five leagues.");
+
+        try {
+          const results = await Promise.allSettled(entries.map(async ([key, league]) => {
+            const endpoint = new URL(`https://site.api.espn.com/apis/site/v2/sports/${league.sport}/${league.league}/news`);
+            endpoint.searchParams.set("limit", "12");
+            const response = await fetch(endpoint, { signal: controller.signal });
+            if (!response.ok) throw new Error(`${league.label} articles request failed (${response.status}).`);
+            const data = await response.json();
+            return (data.articles || []).map(article => ({ article, league: league.label, key }));
+          }));
+          if (version !== articlesRequestVersion) return;
+
+          const failures = results.filter(result => result.status === "rejected");
+          if (failures.length === results.length) throw failures[0].reason;
+          const articles = results.flatMap(result => result.status === "fulfilled" ? result.value : [])
+            .sort((a, b) => new Date(b.article.published || 0) - new Date(a.article.published || 0));
+          const fragment = document.createDocumentFragment();
+          const seen = new Set();
+          for (const entry of articles.slice(0, 24)) {
+            const id = String(entry.article.id || entry.article.links?.web?.href || entry.article.headline);
+            if (seen.has(id)) continue;
+            seen.add(id);
+            const card = makeArticleCard(entry.article, entry.league);
+            if (card) fragment.append(card);
+          }
+          scoreList.replaceChildren();
+          if (!fragment.childNodes.length) {
+            showState("No articles available", "ESPN did not return any headlines for the selected leagues.");
+          } else {
+            scoreList.append(fragment);
+          }
+          if (failures.length) {
+            console.warn(`${failures.length} league article feed(s) could not be loaded.`);
+          }
+          lastUpdated.textContent = `Articles updated ${new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
+        } catch (error) {
+          if (error.name === "AbortError" || version !== articlesRequestVersion) return;
+          console.error("Could not load sports articles.", error);
+          showState("Articles unavailable", "The sports article feeds could not be reached. Check your connection and try again.", true, loadArticles);
+          lastUpdated.textContent = "Articles unavailable";
+        } finally {
+          if (version === articlesRequestVersion) scoreList.setAttribute("aria-busy", "false");
+        }
+      }
+
+      function marketQuote(market, side) {
+        const quote = market?.[side]?.close || market?.[side]?.open;
+        if (!quote) return "—";
+        const line = quote.line ? quote.line.replace(/^o/i, "O ").replace(/^u/i, "U ") : "";
+        const odds = quote.odds || "";
+        return [line, odds].filter(Boolean).join(" ");
+      }
+
+      function oddsTableRow(label, away, home) {
+        const row = makeElement("tr", "");
+        row.append(
+          makeElement("td", "", label),
+          makeElement("td", "", away || "—"),
+          makeElement("td", "", home || "—")
+        );
+        return row;
+      }
+
+      function makeOddsCard(event, leagueKey) {
+        const competition = event.competitions?.[0];
+        const competitors = competition?.competitors || [];
+        const offers = competition?.odds || [];
+        if (competitors.length < 2 || !offers.length) return null;
+        const away = competitors.find(team => team.homeAway === "away") || competitors[0];
+        const home = competitors.find(team => team.homeAway === "home") || competitors[1];
+        const awayName = away.team?.shortDisplayName || away.team?.abbreviation || away.team?.displayName || "Away";
+        const homeName = home.team?.shortDisplayName || home.team?.abbreviation || home.team?.displayName || "Home";
+        const card = makeElement("article", "odds-card");
+        const header = makeElement("div", "odds-game-header");
+        const gameIdentity = makeElement("div", "");
+        gameIdentity.append(makeElement("h3", "odds-game-name", `${awayName} @ ${homeName}`));
+        const dateValue = new Date(event.date);
+        const status = competition.status?.type;
+        const timeLabel = status?.detail || dateValue.toLocaleString(undefined, {
+          month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+        });
+        gameIdentity.append(makeElement("p", "odds-game-meta", timeLabel));
+        header.append(gameIdentity, makeElement("span", "odds-league-badge", leagues[leagueKey].label));
+        card.append(header);
+
+        for (const offer of offers) {
+          const providerName = offer.provider?.displayName || offer.provider?.name || "ESPN odds";
+          card.append(makeElement("p", "odds-provider", providerName));
+          const table = makeElement("table", "odds-table");
+          const head = makeElement("thead", "");
+          const headerRow = makeElement("tr", "");
+          headerRow.append(
+            makeElement("th", "", "Market"),
+            makeElement("th", "", `${awayName} / Over`),
+            makeElement("th", "", `${homeName} / Under`)
+          );
+          head.append(headerRow);
+          const body = makeElement("tbody", "");
+          body.append(
+            oddsTableRow("Spread", marketQuote(offer.pointSpread, "away"), marketQuote(offer.pointSpread, "home")),
+            oddsTableRow("Moneyline", marketQuote(offer.moneyline, "away"), marketQuote(offer.moneyline, "home")),
+            oddsTableRow("Total", marketQuote(offer.total, "over"), marketQuote(offer.total, "under"))
+          );
+          table.append(head, body);
+          card.append(table);
+        }
+
+        const footer = makeElement("div", "score-footer");
+        const sourceNote = makeElement("span", "", "Odds provided by ESPN");
+        const link = makeElement("a", "game-link", "Game details ↗");
+        link.href = `https://www.espn.com/${leagues[leagueKey].sport}/${leagues[leagueKey].league}/scoreboard`;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        footer.append(sourceNote, link);
+        card.append(footer);
+        return card;
+      }
+
+      async function loadOdds() {
+        if (activeRequest) activeRequest.abort();
+        requestVersion++;
+        if (activeArticlesRequest) activeArticlesRequest.abort();
+        articlesRequestVersion++;
+        if (activeOddsRequest) activeOddsRequest.abort();
+
+        const controller = new AbortController();
+        activeOddsRequest = controller;
+        const version = ++oddsRequestVersion;
+        scoreList.classList.remove("is-articles");
+        scoreList.classList.add("is-odds");
+        dateControls.hidden = false;
+        summaryStrip.hidden = false;
+        oddsDisclaimer.hidden = false;
+        scoreboardTitle.textContent = "Betting odds";
+        scoreList.setAttribute("aria-labelledby", "tab-odds");
+        scoreList.setAttribute("aria-busy", "true");
+        gamesCount.textContent = "—";
+        liveCount.textContent = "—";
+        finalCount.textContent = "—";
+        summaryLabels[0].textContent = "GAMES WITH ODDS";
+        summaryLabels[1].textContent = "LEAGUES";
+        summaryLabels[2].textContent = "BOOKMAKERS";
+        showState("Loading betting odds…", "Checking available game lines across MLB, NFL, NHL, FIFA, and NBA.");
+
+        try {
+          const results = await Promise.allSettled(Object.entries(leagues).map(async ([key, league]) => {
+            const endpoint = new URL(`https://site.api.espn.com/apis/site/v2/sports/${league.sport}/${league.league}/scoreboard`);
+            endpoint.searchParams.set("dates", dateKey(date));
+            endpoint.searchParams.set("limit", "100");
+            const response = await fetch(endpoint, { signal: controller.signal });
+            if (!response.ok) throw new Error(`${league.label} odds request failed (${response.status}).`);
+            const data = await response.json();
+            return (data.events || []).map(event => ({ event, league: key }));
+          }));
+          if (version !== oddsRequestVersion) return;
+
+          const failures = results.filter(result => result.status === "rejected");
+          if (failures.length === results.length) throw failures[0].reason;
+          const events = results.flatMap(result => result.status === "fulfilled" ? result.value : []);
+          const cards = events
+            .filter(({ event }) => event.competitions?.some(competition => competition.odds?.length))
+            .map(({ event, league }) => makeOddsCard(event, league))
+            .filter(Boolean)
+            .sort((a, b) => {
+              const leagueA = a.querySelector(".odds-league-badge").textContent;
+              const leagueB = b.querySelector(".odds-league-badge").textContent;
+              return leagueA.localeCompare(leagueB);
+            });
+          const providerCount = new Set(cards.flatMap(card =>
+            [...card.querySelectorAll(".odds-provider")].map(provider => provider.textContent)
+          )).size;
+          const leagueCount = new Set(cards.map(card => card.querySelector(".odds-league-badge").textContent)).size;
+          gamesCount.textContent = String(cards.length);
+          liveCount.textContent = String(leagueCount);
+          finalCount.textContent = String(providerCount);
+          scoreList.replaceChildren();
+          if (!cards.length) {
+            showState("No odds available", "ESPN has no odds for the selected date. Try another day or check the league scoreboards.");
+          } else {
+            scoreList.append(...cards);
+          }
+          if (failures.length) console.warn(`${failures.length} league odds feed(s) could not be loaded.`);
+          lastUpdated.textContent = `Odds updated ${new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
+        } catch (error) {
+          if (error.name === "AbortError" || version !== oddsRequestVersion) return;
+          console.error("Could not load betting odds.", error);
+          showState("Odds unavailable", "The odds feeds could not be reached. Check your connection and try again.", true, loadOdds);
+          lastUpdated.textContent = "Odds unavailable";
+        } finally {
+          if (version === oddsRequestVersion) scoreList.setAttribute("aria-busy", "false");
+        }
+      }
+
+
+      function renderEvents(events) {
+        const games = events || [];
+        const cards = games.map(makeScoreCard).filter(Boolean);
+        gamesCount.textContent = String(cards.length);
+        liveCount.textContent = String(games.filter(event =>
+          event.competitions && event.competitions[0]?.status?.type?.state === "in"
+        ).length);
+        finalCount.textContent = String(games.filter(event =>
+          event.competitions && event.competitions[0]?.status?.type?.completed
+        ).length);
+        scoreList.replaceChildren();
+        if (!cards.length) {
+          showState("No games on this date", "There are no scheduled matchups for this league on the selected day.");
+          return;
+        }
+        scoreList.append(...cards);
+      }
+
+      async function loadScores() {
+        if (activeOddsRequest) activeOddsRequest.abort();
+        oddsRequestVersion++;
+        if (activeArticlesRequest) activeArticlesRequest.abort();
+        articlesRequestVersion++;
+        scoreList.classList.remove("is-odds", "is-articles");
+        dateControls.hidden = false;
+        summaryStrip.hidden = false;
+        oddsDisclaimer.hidden = true;
+        summaryLabels[0].textContent = "GAMES";
+        summaryLabels[1].textContent = "LIVE";
+        summaryLabels[2].textContent = "FINAL";
+        if (activeRequest) activeRequest.abort();
+        activeRequest = new AbortController();
+        const version = ++requestVersion;
+        const league = leagues[currentLeague];
+        const endpoint = new URL(`https://site.api.espn.com/apis/site/v2/sports/${league.sport}/${league.league}/scoreboard`);
+        endpoint.searchParams.set("dates", dateKey(date));
+        endpoint.searchParams.set("limit", "100");
+
+        scoreboardTitle.textContent = `${league.label} scoreboard`;
+        scoreList.setAttribute("aria-labelledby", `tab-${currentLeague}`);
+        scoreList.setAttribute("aria-busy", "true");
+        gamesCount.textContent = "—";
+        liveCount.textContent = "—";
+        finalCount.textContent = "—";
+        showState("Loading scores…", `Fetching the latest ${league.label} scoreboard.`);
+
+        try {
+          const response = await fetch(endpoint, { signal: activeRequest.signal });
+          if (!response.ok) throw new Error(`Scoreboard request failed (${response.status}).`);
+          const data = await response.json();
+          if (version !== requestVersion) return;
+          renderEvents(data.events);
+          lastUpdated.textContent = `Updated ${new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" })}`;
+        } catch (error) {
+          if (error.name === "AbortError" || version !== requestVersion) return;
+          console.error("Could not load scoreboard data.", error);
+          showState("Scores unavailable", "The live scoreboard could not be reached. Check your connection and try again.", true);
+          lastUpdated.textContent = "Update failed";
+        } finally {
+          if (version === requestVersion) scoreList.setAttribute("aria-busy", "false");
+        }
+      }
+
+      function selectLeague(league) {
+        currentView = league === "articles" ? "articles" : league === "odds" ? "odds" : "scores";
+        contentGrid.classList.toggle("is-full-width", currentView !== "scores");
+        sideColumn.hidden = currentView !== "scores";
+        tabs.forEach(tab => {
+          const selected = tab.dataset.league === league;
+          tab.setAttribute("aria-selected", String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+        });
+        if (currentView === "odds") {
+          if (activeRequest) activeRequest.abort();
+          requestVersion++;
+          if (activeArticlesRequest) activeArticlesRequest.abort();
+          articlesRequestVersion++;
+          loadOdds();
+          return;
+        }
+        if (currentView === "articles") {
+          if (activeRequest) activeRequest.abort();
+          requestVersion++;
+          if (activeOddsRequest) activeOddsRequest.abort();
+          oddsRequestVersion++;
+          scoreList.classList.remove("is-odds");
+          dateControls.hidden = true;
+          summaryStrip.hidden = true;
+          oddsDisclaimer.hidden = true;
+          summaryLabels[0].textContent = "GAMES";
+          summaryLabels[1].textContent = "LIVE";
+          summaryLabels[2].textContent = "FINAL";
+          loadArticles();
+          return;
+        }
+        currentLeague = league;
+        loadScores();
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => selectLeague(tab.dataset.league));
+        tab.addEventListener("keydown", event => {
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          const nextIndex = event.key === "Home" ? 0
+            : event.key === "End" ? tabs.length - 1
+            : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+          tabs[nextIndex].focus();
+          selectLeague(tabs[nextIndex].dataset.league);
+        });
+      });
+
+      document.querySelector("#previous-day").addEventListener("click", () => {
+        date.setDate(date.getDate() - 1);
+        updateDateLabel();
+        if (currentView === "odds") loadOdds();
+        else loadScores();
+      });
+      document.querySelector("#next-day").addEventListener("click", () => {
+        date.setDate(date.getDate() + 1);
+        updateDateLabel();
+        if (currentView === "odds") loadOdds();
+        else loadScores();
+      });
+      document.querySelector("#refresh-scores").addEventListener("click", () => {
+        if (currentView === "articles") loadArticles();
+        else if (currentView === "odds") loadOdds();
+        else loadScores();
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) return;
+        if (currentView === "articles") loadArticles();
+        else if (currentView === "odds") loadOdds();
+        else loadScores();
+      });
+      window.setInterval(() => {
+        if (document.hidden) return;
+        if (currentView === "articles") loadArticles();
+        else if (currentView === "odds") loadOdds();
+        else loadScores();
+      }, 60000);
+
+      updateDateLabel();
+      loadScores();
+    })();
+  </script>
+</body>
+</html>
