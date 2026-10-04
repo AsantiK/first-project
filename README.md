@@ -10,4 +10,4 @@ A responsive romantic website with:
 
 The site is published at:
 
-https://www.letter2you.com/wife-love-board.html
+https://www.dtth.com/wife-love-board.html
