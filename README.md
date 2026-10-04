@@ -10,4 +10,4 @@ A responsive romantic website with:
 
 The site is published at:
 
-https://www.dtth.com/wife-love-board.html
+https://asantik.github.io/first-project/wife-love-board.html
