@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For My Wife</title>
+  <style>
+    :root {
+      --bg: #fff8f7;
+      --bg-2: #ffe9e5;
+      --panel: rgba(255, 255, 255, 0.7);
+      --panel-strong: #fff;
+      --rose: #d85b6f;
+      --rose-deep: #b63b52;
+      --rose-soft: #ffe1e7;
+      --gold: #f9c76a;
+      --text: #2b1d1e;
+      --muted: #6d4d4f;
+      --line: rgba(184, 90, 106, 0.2);
+      --shadow: 0 24px 60px rgba(191, 94, 110, 0.16);
+      --success: #5fa88d;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(249, 199, 106, 0.42), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(216, 91, 111, 0.24), transparent 28%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+    }
+
+    .page {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 28px 18px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 12px 14px auto auto;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 226, 96, 0.42), transparent 64%);
+      pointer-events: none;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      color: var(--text);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--rose), #ed82a1);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(170, 69, 88, 0.22);
+      font-size: 1.2rem;
+    }
+
+    .date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.62);
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 5px rgba(95, 168, 141, 0.12);
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.35fr 0.9fr;
+      gap: 24px;
+      align-items: end;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.8rem, 3vw, 4.5rem);
+      line-height: 0.97;
+      letter-spacing: -0.06em;
+    }
+
+    .subtitle {
+      margin: 18px 0 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 1.07rem;
+      line-height: 1.7;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255, 232, 222, 0.8));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px 20px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .daily-poem {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 18px;
+      margin-top: 24px;
+      padding: 20px 24px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.62);
+      box-shadow: var(--shadow);
+    }
+
+    .poem-icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--rose-soft);
+      color: var(--rose-deep);
+      font-size: 1.25rem;
+    }
+
+    .poem-label {
+      margin: 0 0 6px;
+      color: var(--rose-deep);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .poem-text {
+      margin: 0;
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.7;
+      font-style: italic;
+      white-space: pre-line;
+    }
+
+    .quote-translation {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .flower-gallery {
+      margin-top: 24px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .flower-gallery h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.4rem, 2vw, 2.1rem);
+      letter-spacing: -0.05em;
+    }
+
+    .flower-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .flower-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 190px;
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--rose-soft);
+    }
+
+    .flower-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 190px;
+      object-fit: cover;
+      transition: transform 250ms ease;
+    }
+
+    .flower-card:hover img {
+      transform: scale(1.04);
+    }
+
+    .flower-card figcaption {
+      position: absolute;
+      inset: auto 0 0;
+      padding: 24px 14px 13px;
+      color: #fff;
+      background: linear-gradient(transparent, rgba(43, 29, 30, 0.72));
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .mini-label {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(216, 91, 111, 0.08);
+      color: var(--rose-deep);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .love-note {
+      margin: 0;
+      font-size: clamp(1.2rem, 1.8vw, 1.8rem);
+      line-height: 1.4;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+
+    .note-author {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel h2 {
+      margin: 0 0 24px;
+      font-size: clamp(1.4rem, 2vw, 2.1rem);
+      letter-spacing: -0.05em;
+    }
+
+    .memory-grid,
+    .ideas-grid,
+    .quotes-grid,
+    .checklist-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .memory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ideas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .quotes-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .checklist-grid { grid-template-columns: 1fr; }
+
+    .memory-card,
+    .idea-card,
+    .quote-card,
+    .check-item,
+    .message-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.7);
+    }
+
+    .memory-card {
+      padding: 18px 16px;
+    }
+
+    .memory-pill {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(249, 199, 106, 0.18);
+      color: #8c6525;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .memory-card h3 {
+      margin: 14px 0 10px;
+      font-size: 1.2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .memory-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .idea-card {
+      padding: 16px 18px;
+    }
+
+    .idea-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .idea-card span {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .quote-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 18px 16px;
+    }
+
+    .quote-mark {
+      color: var(--rose);
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .quote-text {
+      margin: 0;
+      color: var(--text);
+      font-size: 1.08rem;
+      line-height: 1.7;
+      letter-spacing: -0.02em;
+    }
+
+    .quote-author {
+      color: var(--muted);
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .quote-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    .check-item label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .check-item input {
+      accent-color: var(--rose);
+      width: 18px;
+      height: 18px;
+    }
+
+    .check-item small {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .composer {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .message-box {
+      padding: 18px 18px 12px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      line-height: 1.7;
+      outline: none;
+    }
+
+    textarea::placeholder {
+      color: #a57d83;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .tip {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .primary {
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+      color: #fff;
+      box-shadow: 0 14px 26px rgba(199, 74, 94, 0.25);
+    }
+
+    .secondary {
+      padding: 10px 14px;
+      background: rgba(216, 91, 111, 0.08);
+      color: var(--rose-deep);
+    }
+
+    .countdown {
+      display: grid;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .countdown-card {
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,237,227,0.8));
+    }
+
+    .countdown-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .countdown-value {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0;
+    }
+
+    .countdown-unit {
+      padding: 12px 6px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.7);
+      text-align: center;
+    }
+
+    .countdown-number {
+      display: block;
+      font-size: clamp(1.3rem, 2vw, 2rem);
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+    }
+
+    .countdown-unit-label {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .countdown-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    .date-input {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.8);
+      color: var(--text);
+      font: inherit;
+    }
+
+    @media (max-width: 840px) {
+      .hero-grid,
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .memory-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flower-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: min(100% - 20px, 1100px);
+      }
+
+      .hero,
+      .panel {
+        padding: 18px 16px;
+      }
+
+      .daily-poem {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 18px;
+      }
+
+      .flower-gallery {
+        padding: 18px 16px;
+      }
+
+      .flower-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .ideas-grid,
+      .quotes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="topbar">
+        <a href="#" class="brand" aria-label="For My Wife home">
+          <span class="brand-mark">❤</span>
+          For My Wife
+        </a>
+        <div class="date-badge">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="today-date">Today</span>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h1>Love, laughter,<br />and a little forever.</h1>
+          <p class="subtitle">A tiny space built for the woman who makes everyday life brighter, gentler, and much more beautiful. This is a reminder that my love for you keeps growing.</p>
+        </div>
+
+        <div class="hero-card" aria-live="polite">
+          <span class="mini-label">Today’s note</span>
+          <p id="love-message" class="love-note">You are my favorite place to come home to.</p>
+          <div class="note-author">— Always yours</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="daily-poem" aria-labelledby="poem-label" aria-live="polite">
+      <div class="poem-icon" aria-hidden="true">✦</div>
+      <div>
+        <p class="poem-label" id="poem-label">A little poem for tonight</p>
+        <p class="poem-text" id="daily-poem-text"></p>
+      </div>
+    </section>
+
+    <section class="daily-poem" aria-labelledby="vietnamese-quote-label" aria-live="polite">
+      <div class="poem-icon" aria-hidden="true">♥</div>
+      <div>
+        <p class="poem-label" id="vietnamese-quote-label">Lời yêu thương mỗi ngày</p>
+        <p class="poem-text" id="vietnamese-quote-text" lang="vi"></p>
+        <p class="quote-translation" id="vietnamese-quote-translation" lang="en"></p>
+      </div>
+    </section>
+
+    <section class="flower-gallery" aria-labelledby="flower-gallery-title">
+      <h2 id="flower-gallery-title">A little garden for you</h2>
+      <div class="flower-grid">
+        <figure class="flower-card">
+          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Soft pink flowers in gentle light" loading="lazy" />
+          <figcaption>Soft as your smile</figcaption>
+        </figure>
+        <figure class="flower-card">
+          <img src="https://images.unsplash.com/photo-1494972308805-463bc619d34e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="A bright, colorful flower in bloom" loading="lazy" />
+          <figcaption>A little color for your day</figcaption>
+        </figure>
+        <figure class="flower-card">
+          <img src="https://images.unsplash.com/photo-1499002238440-d264edd596ec?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="A lovely bouquet of flowers" loading="lazy" />
+          <figcaption>Just because</figcaption>
+        </figure>
+        <figure class="flower-card">
+          <img src="https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="A garden of flowers glowing in sunlight" loading="lazy" />
+          <figcaption>Every day, you bloom</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <main class="content">
+      <section class="panel">
+        <h2>Our sweet memories</h2>
+        <div class="memory-grid">
+          <article class="memory-card">
+            <span class="memory-pill">First chapter</span>
+            <h3>Our beginning</h3>
+            <p>Every time I look at us, I see how beautifully life keeps unfolding. You made ordinary moments feel like home.</p>
+          </article>
+
+          <article class="memory-card">
+            <span class="memory-pill">Best feeling</span>
+            <h3>Comfort</h3>
+            <p>Your love feels safe, warm, and steady. It is the kind of peace I want to carry with me everywhere I go.</p>
+          </article>
+
+          <article class="memory-card">
+            <span class="memory-pill">My favorite part</span>
+            <h3>Us</h3>
+            <p>The best part of my life is not just the big moments — it is all the little ones shared with you.</p>
+          </article>
+        </div>
+
+        <div class="countdown">
+          <div class="countdown-card">
+            <p class="countdown-label">Countdown to our November 9 anniversary</p>
+            <div class="countdown-value" aria-label="Time remaining until our anniversary">
+              <div class="countdown-unit"><span id="countdown-days" class="countdown-number">—</span><span class="countdown-unit-label">Days</span></div>
+              <div class="countdown-unit"><span id="countdown-hours" class="countdown-number">—</span><span class="countdown-unit-label">Hours</span></div>
+              <div class="countdown-unit"><span id="countdown-minutes" class="countdown-number">—</span><span class="countdown-unit-label">Minutes</span></div>
+              <div class="countdown-unit"><span id="countdown-seconds" class="countdown-number">—</span><span class="countdown-unit-label">Seconds</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Little reasons I adore you</h2>
+        <div class="ideas-grid">
+          <div class="idea-card">
+            <strong>Kindness</strong>
+            <span>You make the world softer with your heart.</span>
+          </div>
+          <div class="idea-card">
+            <strong>Laughs</strong>
+            <span>Your smile turns even a tired day into something brighter.</span>
+          </div>
+          <div class="idea-card">
+            <strong>Strength</strong>
+            <span>You handle life with grace and courage, and I admire that.</span>
+          </div>
+          <div class="idea-card">
+            <strong>Love</strong>
+            <span>You are the reason I believe in beautiful, lasting love.</span>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="message-box">
+            <textarea id="love-letter" maxlength="500" placeholder="Write a note for her..."></textarea>
+          </div>
+          <div class="actions">
+            <span class="tip">Saved in this browser.</span>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="secondary" id="clear-note">Clear</button>
+              <button type="button" class="primary" id="save-note">Save note</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel" style="margin-top:24px;">
+      <h2>Love Letters of the day</h2>
+      <div id="quote-grid" class="quotes-grid" aria-live="polite"></div>
+      <div class="quote-actions">
+        <button type="button" class="primary" id="new-quote">Shuffle letters</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const loveMessages = [
+      "You are my favorite place to come home to.",
+      "I still fall for you in the quiet moments.",
+      "You are the softness in my life and the strength in my heart.",
+      "My love for you grows deeper every day.",
+      "You make life feel warmer, brighter, and more beautiful."
+    ];
+
+    const loveLetters = [
+      {
+        text: "I love you without knowing how, or when, or from where. I love you simply, without problems or pride: I love you in this way because I do not know any other way of loving but this, in which there is no I or you, so intimate that your hand upon my chest is my hand, so intimate that when I fall asleep your eyes close with mine.",
+        author: "Pablo Neruda"
+      },
+      {
+        text: "My heart is, and always will be, yours.",
+        author: "Jane Austen"
+      },
+      {
+        text: "You are my sun, my moon, and all my stars.",
+        author: "E. E. Cummings"
+      },
+      {
+        text: "I am in you and you in me, mutual in divine love.",
+        author: "Rumi"
+      },
+      {
+        text: "The best thing to hold onto in life is each other.",
+        author: "Audrey Hepburn"
+      },
+      {
+        text: "Love is not just looking at each other, it's looking in the same direction.",
+        author: "Antoine de Saint-Exupéry"
+      }
+    ];
+
+    const dailyPoems = [
+      "When the lamps grow low,\nyour hand finds mine in the quiet.\nThe whole world can wait\nwhile our two hearts speak.",
+      "A kiss, a whispered laugh,\nyour warmth beside my own—\nsoon the night is ours,\nand nowhere else to be.",
+      "Let the evening linger;\nlet the candles burn down slow.\nYour smile says stay close,\nand I already know.",
+      "The door clicks shut,\nthe day's long noise grows dim.\nI draw you near,\nand find my favorite place again.",
+      "Moonlight at the window,\nyour shoulder under my cheek.\nOne tender look between us,\nand words grow soft and weak.",
+      "We save the sweetest things\nfor when the house is still:\nyour lips, my arms around you,\nand all the time we will.",
+      "No grand words tonight—\njust your fingers finding mine,\na slow kiss in the lamplight,\nand the lovely loss of time."
+    ];
+
+    const dailyVietnameseQuotes = [
+      {
+        text: "Anh yêu em không chỉ vì em là ai, mà còn vì em khiến thế giới của anh trở nên đẹp đẽ hơn.",
+        translation: "I love you not only for who you are, but for making my world more beautiful."
+      },
+      {
+        text: "Có em bên cạnh, những ngày bình thường cũng hóa thành điều đáng nhớ.",
+        translation: "With you beside me, even ordinary days become memorable."
+      },
+      {
+        text: "Nắm tay em, anh thấy mọi con đường đều dẫn về nhà.",
+        translation: "Holding your hand, every road feels like it leads home."
+      },
+      {
+        text: "Điều anh thích nhất ở ngày mai là được gặp em thêm một lần nữa.",
+        translation: "My favorite thing about tomorrow is getting to see you one more time."
+      },
+      {
+        text: "Tình yêu của anh dành cho em lớn lên trong từng điều nhỏ bé mỗi ngày.",
+        translation: "My love for you grows through the little things, day after day."
+      },
+      {
+        text: "Giữa bao điều đẹp đẽ, nụ cười của em vẫn là điều anh muốn ngắm nhìn nhất.",
+        translation: "Among all the beautiful things, your smile is still the one I most want to see."
+      },
+      {
+        text: "Nhà không chỉ là một nơi; nhà là nơi có em.",
+        translation: "Home is not just a place; home is wherever you are."
+      }
+    ];
+
+    const loveMessage = document.getElementById("love-message");
+    const dateLabel = document.getElementById("today-date");
+    const saveButton = document.getElementById("save-note");
+    const clearButton = document.getElementById("clear-note");
+    const letterArea = document.getElementById("love-letter");
+    const countdownDays = document.getElementById("countdown-days");
+    const countdownHours = document.getElementById("countdown-hours");
+    const countdownMinutes = document.getElementById("countdown-minutes");
+    const countdownSeconds = document.getElementById("countdown-seconds");
+    const quoteGrid = document.getElementById("quote-grid");
+    const newQuoteButton = document.getElementById("new-quote");
+    const dailyPoemText = document.getElementById("daily-poem-text");
+    const vietnameseQuoteText = document.getElementById("vietnamese-quote-text");
+    const vietnameseQuoteTranslation = document.getElementById("vietnamese-quote-translation");
+
+    function getDailyIndex(entries) {
+      const now = new Date();
+      const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+      return ((dayNumber % entries.length) + entries.length) % entries.length;
+    }
+
+    function showDailyPoem() {
+      dailyPoemText.textContent = dailyPoems[getDailyIndex(dailyPoems)];
+    }
+
+    function showDailyVietnameseQuote() {
+      const quote = dailyVietnameseQuotes[getDailyIndex(dailyVietnameseQuotes)];
+      vietnameseQuoteText.textContent = quote.text;
+      vietnameseQuoteTranslation.textContent = quote.translation;
+    }
+
+    function scheduleDailyPoemUpdate() {
+      const now = new Date();
+      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      window.setTimeout(() => {
+        showDailyPoem();
+        showDailyVietnameseQuote();
+        scheduleDailyPoemUpdate();
+      }, nextMidnight - now);
+    }
+
+    showDailyPoem();
+    showDailyVietnameseQuote();
+    scheduleDailyPoemUpdate();
+
+    function getDailyLetterStart() {
+      const now = new Date();
+      const dayNumber = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+      return dayNumber % loveLetters.length;
+    }
+
+    let currentLetterStart = getDailyLetterStart();
+
+    function renderLoveLetters(startIndex = currentLetterStart) {
+      currentLetterStart = startIndex;
+      const dailyLetters = Array.from({ length: 4 }, (_, index) =>
+        loveLetters[(startIndex + index) % loveLetters.length]
+      );
+      quoteGrid.innerHTML = "";
+
+      dailyLetters.forEach(entry => {
+        const card = document.createElement("article");
+        card.className = "quote-card";
+
+        const mark = document.createElement("div");
+        mark.className = "quote-mark";
+        mark.textContent = "“";
+
+        const quote = document.createElement("p");
+        quote.className = "quote-text";
+        quote.textContent = entry.text;
+
+        const author = document.createElement("div");
+        author.className = "quote-author";
+        author.textContent = `— ${entry.author}`;
+
+        card.append(mark, quote, author);
+        quoteGrid.appendChild(card);
+      });
+    }
+
+    if (quoteGrid) {
+      renderLoveLetters();
+      newQuoteButton.addEventListener("click", () => {
+        const nextStart = Math.floor(Math.random() * (loveLetters.length - 1));
+        renderLoveLetters(nextStart >= currentLetterStart ? nextStart + 1 : nextStart);
+      });
+    }
+
+    const today = new Date();
+    dateLabel.textContent = today.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+
+    const randomized = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+    loveMessage.textContent = randomized;
+
+    const savedNote = localStorage.getItem("wife-love-note");
+    if (savedNote) {
+      letterArea.value = savedNote;
+    }
+
+    saveButton.addEventListener("click", () => {
+      localStorage.setItem("wife-love-note", letterArea.value.trim());
+      saveButton.textContent = "Saved";
+      setTimeout(() => {
+        saveButton.textContent = "Save note";
+      }, 1000);
+    });
+
+    clearButton.addEventListener("click", () => {
+      letterArea.value = "";
+      localStorage.removeItem("wife-love-note");
+    });
+
+    function updateCountdown() {
+      const now = new Date();
+      let anniversary = new Date(now.getFullYear(), 10, 9);
+      if (anniversary <= now) anniversary = new Date(now.getFullYear() + 1, 10, 9);
+      const secondsRemaining = Math.floor((anniversary - now) / 1000);
+      const days = Math.floor(secondsRemaining / 86400);
+      const hours = Math.floor((secondsRemaining % 86400) / 3600);
+      const minutes = Math.floor((secondsRemaining % 3600) / 60);
+      const seconds = secondsRemaining % 60;
+      countdownDays.textContent = String(days);
+      countdownHours.textContent = String(hours).padStart(2, "0");
+      countdownMinutes.textContent = String(minutes).padStart(2, "0");
+      countdownSeconds.textContent = String(seconds).padStart(2, "0");
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
