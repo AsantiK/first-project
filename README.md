@@ -8,6 +8,6 @@ A responsive romantic website with:
 - daily Vietnamese love quotes with English translations
 - a personal note saved in the browser
 
-Once these changes are merged into `master`, open the published site at:
+The site is published at:
 
-https://asantik.github.io/first-project/wife-love-board.html
+https://www.letter2you.com/wife-love-board.html
